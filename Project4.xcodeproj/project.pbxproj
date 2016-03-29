@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4C5175621CAA236000EB0837 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C5175611CAA236000EB0837 /* main.cpp */; };
+		4C51756A1CAA248A00EB0837 /* semantic.c in Sources */ = {isa = PBXBuildFile; fileRef = 4C5175691CAA248A00EB0837 /* semantic.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +24,8 @@
 
 /* Begin PBXFileReference section */
 		4C51755E1CAA236000EB0837 /* Project4 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Project4; sourceTree = BUILT_PRODUCTS_DIR; };
-		4C5175611CAA236000EB0837 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		4C5175681CAA244200EB0837 /* syntax.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = syntax.h; sourceTree = "<group>"; };
+		4C5175691CAA248A00EB0837 /* semantic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = semantic.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +58,8 @@
 		4C5175601CAA236000EB0837 /* Project4 */ = {
 			isa = PBXGroup;
 			children = (
-				4C5175611CAA236000EB0837 /* main.cpp */,
+				4C5175681CAA244200EB0837 /* syntax.h */,
+				4C5175691CAA248A00EB0837 /* semantic.c */,
 			);
 			path = Project4;
 			sourceTree = "<group>";
@@ -118,7 +120,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C5175621CAA236000EB0837 /* main.cpp in Sources */,
+				4C51756A1CAA248A00EB0837 /* semantic.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
