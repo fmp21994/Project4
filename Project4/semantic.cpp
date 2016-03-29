@@ -505,6 +505,12 @@ struct switch_stmtNode* switch_stmt()
 struct while_stmtNode* do_stmt()
 {
         // TODO: implement this
+    struct while_stmtNode* whileStmt;
+    t_type = getToken();
+    if (t_type == WHILE) {
+        whileStmt->condition = condition();
+    }
+    
     return NULL;
 }
 
@@ -517,6 +523,14 @@ struct primaryNode* primary()
 struct conditionNode* condition()
 {
         // TODO: implement this
+    struct conditionNode* condition;
+    t_type = getToken();
+    if (t_type == LPAREN) {
+        t_type = getToken();
+        
+    } else {
+        syntax_error("while. LPAREN expected");
+    }
     return NULL;
 }
 
@@ -525,6 +539,8 @@ struct while_stmtNode* while_stmt()
         // TODO: implement this
     return NULL;
 }
+
+
 
 struct exprNode* factor()
 {
