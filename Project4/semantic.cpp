@@ -505,18 +505,46 @@ struct switch_stmtNode* switch_stmt()
 struct while_stmtNode* do_stmt()
 {
         // TODO: implement this
-    struct while_stmtNode* whileStmt;
+    struct while_stmtNode* doStmt;
+    doStmt->body = body();
     t_type = getToken();
-    if (t_type == WHILE) {
-        whileStmt->condition = condition();
+    if (t_type == WHILE)
+    {
+        doStmt->condition = condition();
+        t_type = getToken();
+        if (t_type == SEMICOLON)
+        {
+            return doStmt;
+        }
+        else
+        {
+            syntax_error("do. SEMICOLON expected");
+        }
     }
-    
-    return NULL;
+    else
+    {
+        syntax_error("do. WHILE expected");
+    }
+        return NULL;
 }
 
 struct primaryNode* primary()
 {
         // TODO: implement this
+    struct primaryNode* primary;
+    t_type = getToken();
+    if (t_type == ID) {
+        primary = ALLOC(struct primaryNode);
+        primary->tag = ID;
+        primary->id = token;
+    }
+    else if(t_type == NUM)
+    {
+        primary = ALLOC(struct primaryNode);
+        primary->tag = NUM;
+        primary->ival =
+    }
+    
     return NULL;
 }
 
@@ -525,13 +553,35 @@ struct conditionNode* condition()
         // TODO: implement this
     struct conditionNode* condition;
     t_type = getToken();
-    if (t_type == LPAREN) {
+    if (t_type == LPAREN)
+    {
+        condition = ALLOC(struct conditionNode);
+        condition->left_operand = ALLOC(struct primaryNode);
+        condition->left_operand = primary();
         t_type = getToken();
-        
-    } else {
-        syntax_error("while. LPAREN expected");
+        if (t_type == GREATER || t_type == GTEQ || t_type == LESS || t_type == NOTEQUAL || t_type == LTEQ) {
+            condition->relop = t_type;
+            condition->left_operand = ALLOC(struct primaryNode);
+            condition->right_operand = primary();
+            t_type = getToken();
+            if (t_type == RPAREN) {
+                return condition;
+            }
+            else
+            {
+                syntax_error("condition. RPAREN expected");
+            }
+        }
+        else
+        {
+            syntax_error("condition. RELOP expected");
+        }
     }
-    return NULL;
+    else
+    {
+        syntax_error("condidtion. LPAREN expected")
+    }
+      return NULL;
 }
 
 struct while_stmtNode* while_stmt()
