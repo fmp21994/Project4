@@ -18,12 +18,27 @@
 #include <ctype.h>
 #include <assert.h>
 #include "syntax.h"
+#include <string>
+#include <vector>
+#include <iostream>
 
 /* ------------------------------------------------------- */
 /* -------------------- LEXER SECTION -------------------- */
 /* ------------------------------------------------------- */
-
+using namespace std;
 #define KEYWORDS  11
+
+vector<string> expTypeTable;
+
+struct typeDecl {
+    vector<string> idList;
+    int type;
+    string implicitType;
+    bool isexplicit = true;
+};
+struct table {
+    vector<string> symbols;
+};
 
 typedef enum
 {
@@ -479,6 +494,33 @@ void print_switch_stmt(struct switch_stmtNode* switc)
 {
         // TODO: implement this for your own debugging purposes
 }
+    //----------------------------------------------------------------------------------------errors----------------------------------//
+void checkError11(programNode* parseTree)
+{
+    type_decl_listNode *tdl;
+    id_listNode *il;
+    
+    tdl = parseTree->decl->type_decl_section->type_decl_list->type_decl_list;
+    
+    while (tdl != NULL)
+    {
+        il = tdl->type_decl->id_list;
+        while (il != NULL)
+        {
+            string candidate = il->id;
+            if (find(expTypeTable.begin(), expTypeTable.end(), candidate) == expTypeTable.end())
+            {
+                expTypeTable.push_back(il->id);
+                il = il->id_list;
+            }
+            else
+            {
+                cout << "ERROR CODE 1.1 " << candidate << endl;
+            }
+        }
+        tdl = tdl->type_decl_list;
+    }
+}
 
 /* -------------------- PARSING AND BUILDING PARSE TREE -------------------- */
 
@@ -508,7 +550,7 @@ struct while_stmtNode* do_stmt()
     struct while_stmtNode* doStmt;
     doStmt->body = body();
     t_type = getToken();
-    if (t_type == WHILE)
+    if (t_type == DO)
     {
         doStmt->condition = condition();
         t_type = getToken();
@@ -533,18 +575,27 @@ struct primaryNode* primary()
         // TODO: implement this
     struct primaryNode* primary;
     t_type = getToken();
-    if (t_type == ID) {
+    if (t_type == ID)
+    {
         primary = ALLOC(struct primaryNode);
         primary->tag = ID;
         primary->id = token;
+        return primary;
     }
     else if(t_type == NUM)
     {
         primary = ALLOC(struct primaryNode);
         primary->tag = NUM;
-        primary->ival =
+        primary->ival = atoi(token);
+        return primary;
     }
-    
+    else if(t_type == REALNUM)
+    {
+        primary = ALLOC(struct primaryNode);
+        primary->tag = REALNUM;
+        primary->fval = atof(token);
+        return primary;
+    }
     return NULL;
 }
 
@@ -553,40 +604,43 @@ struct conditionNode* condition()
         // TODO: implement this
     struct conditionNode* condition;
     t_type = getToken();
-    if (t_type == LPAREN)
+    if (t_type == ID)
     {
         condition = ALLOC(struct conditionNode);
-        condition->left_operand = ALLOC(struct primaryNode);
         condition->left_operand = primary();
         t_type = getToken();
-        if (t_type == GREATER || t_type == GTEQ || t_type == LESS || t_type == NOTEQUAL || t_type == LTEQ) {
+        if (t_type == GREATER || t_type == GTEQ || t_type == LESS || t_type == NOTEQUAL || t_type == LTEQ)
+        {
             condition->relop = t_type;
-            condition->left_operand = ALLOC(struct primaryNode);
             condition->right_operand = primary();
-            t_type = getToken();
-            if (t_type == RPAREN) {
-                return condition;
-            }
-            else
-            {
-                syntax_error("condition. RPAREN expected");
-            }
+            return condition;
         }
         else
         {
-            syntax_error("condition. RELOP expected");
+            ungetToken();
+            return condition;
         }
     }
     else
     {
-        syntax_error("condidtion. LPAREN expected")
+        syntax_error("condition. ID or primary relop primary expected");
+        return NULL;
     }
-      return NULL;
 }
 
 struct while_stmtNode* while_stmt()
 {
         // TODO: implement this
+    struct while_stmtNode* whileStmt;
+    t_type = getToken();
+    if (t_type == WHILE) {
+        whileStmt = ALLOC(struct while_stmtNode);
+        whileStmt->condition = condition();
+        whileStmt->body = body();
+        return whileStmt;
+
+    }
+    
     return NULL;
 }
 
@@ -1191,7 +1245,9 @@ int main()
     struct programNode* parseTree;
     parseTree = program();
         // TODO: remove the next line after you complete the parser
-    print_parse_tree(parseTree); // This is just for debugging purposes
+        //print_parse_tree(parseTree); // This is just for debugging purposes
                                  // TODO: do type checking & print output according to project specification
+    
+    
     return 0;
 }

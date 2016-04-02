@@ -190,6 +190,8 @@ void print_case(struct caseNode* cas);
 void print_case_list(struct case_listNode* case_list);
 void print_switch_stmt(struct switch_stmtNode* switc);
 
+void checkError11();
+
 /* -------------------- PARSING FUNCTIONS -------------------- */
 
 struct programNode*           program();
