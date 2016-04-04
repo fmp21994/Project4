@@ -191,6 +191,12 @@ void print_case_list(struct case_listNode* case_list);
 void print_switch_stmt(struct switch_stmtNode* switc);
 
 void checkError11();
+void checkError12();
+void checkError13();
+void checkError14();
+void checkError21();
+void checkError22();
+
 
 /* -------------------- PARSING FUNCTIONS -------------------- */
 

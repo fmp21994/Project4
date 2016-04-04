@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 /* ------------------------------------------------------- */
 /* -------------------- LEXER SECTION -------------------- */
@@ -28,14 +29,34 @@
 using namespace std;
 #define KEYWORDS  11
 
-vector<string> expTypeTable;
+vector<string> explicitTypes;
+vector<string> implicitTypes;
 
 struct typeDecl {
-    vector<string> idList;
+    string id;
     int type;
     string implicitType;
-    bool isexplicit = true;
+    bool isExplicit;
+    
+    typeDecl()
+    {
+        
+    }
+    typeDecl(string id, int type)
+    {
+        this->id = id;
+        this->type = type;
+        this->isExplicit = true;
+    };
+    typeDecl(string id, string implicitType)
+    {
+        this->id = id;
+        this->implicitType = implicitType;
+        this->isExplicit = false;
+    };
 };
+vector<typeDecl> types;
+
 struct table {
     vector<string> symbols;
 };
@@ -497,29 +518,92 @@ void print_switch_stmt(struct switch_stmtNode* switc)
     //----------------------------------------------------------------------------------------errors----------------------------------//
 void checkError11(programNode* parseTree)
 {
+    vector<string> tempTypeTable;
+
     type_decl_listNode *tdl;
     id_listNode *il;
-    
-    tdl = parseTree->decl->type_decl_section->type_decl_list->type_decl_list;
-    
+   
+    tdl = parseTree->decl->type_decl_section->type_decl_list;
     while (tdl != NULL)
     {
         il = tdl->type_decl->id_list;
         while (il != NULL)
         {
             string candidate = il->id;
-            if (find(expTypeTable.begin(), expTypeTable.end(), candidate) == expTypeTable.end())
+            if (find(tempTypeTable.begin(), tempTypeTable.end(), candidate) == tempTypeTable.end())
             {
-                expTypeTable.push_back(il->id);
-                il = il->id_list;
+                tempTypeTable.push_back(candidate);
+                
             }
             else
             {
                 cout << "ERROR CODE 1.1 " << candidate << endl;
             }
+            il = il->id_list;
         }
         tdl = tdl->type_decl_list;
     }
+}
+
+
+
+void checkError12(programNode* parseTree)
+{
+    for (int i = 0; i < types.size(); i++) {
+        for (int j = 0; j < types.size(); j++) {
+            if (!types[j].isExplicit) {
+                if (types[i].id == types[j].implicitType) {
+                    cout << "ERROR CODE 1.2 " << types[i].id << endl;
+                    break;
+                }
+            }
+        }
+    }
+}
+//    type_decl_listNode* tdl = parseTree->decl->type_decl_section->type_decl_list;
+//    id_listNode *il;
+//    
+//    while (tdl != NULL)
+//    {
+//        il = tdl->type_decl->id_list;
+//        while (il != NULL)
+//        {
+//            string candidate = il->id;
+//            for (int i = 0; i < types.size(); i++)
+//            {
+//                if (!types[i].isExplicit)
+//                {
+//                    if (types[i].implicitType == candidate)
+//                    {
+//                        cout << "ERROR CODE 1.2 " << candidate << i << endl;
+//                        
+//                    }
+//                }
+//            }
+//            il = il->id_list;
+//        }
+//        tdl = tdl->type_decl_list;
+//    }
+
+
+void checkError13()
+{
+        // TODO: Complete Error 1.3
+}
+
+void checkError14()
+{
+        // TODO: Complete Error 1.4
+}
+
+void checkError21()
+{
+        // TODO: Complete Error 2.1
+}
+
+void checkError22()
+{
+        // TODO: Complete Error 2.2
 }
 
 /* -------------------- PARSING AND BUILDING PARSE TREE -------------------- */
@@ -777,6 +861,7 @@ struct exprNode* expr()
         else
         {
             syntax_error("expr. PLUS, MINUS, or SEMICOLON expected");
+            syntax_error("");
         }
     }
     else
@@ -1240,14 +1325,76 @@ struct programNode* program()
     return NULL; // control never reaches here, this is just for the sake of GCC
 }
 
+void addTypes(id_listNode* il, type_nameNode* type_name)
+{
+    while (il != NULL)
+    {
+        if (type_name->id == NULL) // which means it is an explicit type
+        {
+            typeDecl temp = *new typeDecl();
+            temp.isExplicit = true;
+            temp.type = type_name->type;
+            temp.id = il->id;
+            types.push_back(temp);
+        }
+        else // which means its an implicit type
+        {
+            typeDecl temp = *new typeDecl();
+            temp.isExplicit = false;
+            temp.implicitType = type_name->id;
+            temp.id = il->id;
+            types.push_back(temp);
+        }
+        il = il->id_list;
+    }
+}
+//typeDecl(string id, int type)
+//{
+//    this->id = id;
+//    this->type = type;
+//    this->isExplicit = true;
+//};
+//typeDecl(string id, string implicitType)
+//{
+//    this->id = id;
+//    this->type = type;
+//    this->implicitType = implicitType;
+//    this->isExplicit = false;
+//};
+
+void addVars(id_listNode* il, type_nameNode* type_name)
+{
+        // TODO: Fill addVars
+}
 int main()
 {
     struct programNode* parseTree;
     parseTree = program();
         // TODO: remove the next line after you complete the parser
         //print_parse_tree(parseTree); // This is just for debugging purposes
-                                 // TODO: do type checking & print output according to project specification
+        // TODO: do type checking & print output according to project specification
     
+    type_decl_listNode *tdl = parseTree->decl->type_decl_section->type_decl_list;
+    type_declNode *td;
+    id_listNode *til;
+    while (tdl != NULL)
+    {
+        td = tdl->type_decl;
+        til = td->id_list;
+        addTypes(til, td->type_name);
+        tdl = tdl->type_decl_list;
+    }
+    var_decl_listNode *vdl = parseTree->decl->var_decl_section->var_decl_list;
+    var_declNode *vd;
+    id_listNode *vil;
     
+    while (vdl != NULL) {
+        vd = vdl->var_decl;
+        vil = vd->id_list;
+        addVars(vil, vd->type_name);
+        vdl = vdl->var_decl_list;
+    }
+    checkError11(parseTree);
+    checkError12(parseTree);
     return 0;
 }
